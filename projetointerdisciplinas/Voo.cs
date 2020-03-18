@@ -63,6 +63,13 @@ namespace projetointerdisciplinar
             return false;
         }
 
+        public bool PossuiReserva(string CPF)
+        {
+            if (seats.ContainsValue(CPF) || waitingLine.Contains(CPF))
+                return true;
+            return false;
+        }
+
         private void ReservarAssento(int assentoPassageiro, string v)
         {
             throw new NotImplementedException();
