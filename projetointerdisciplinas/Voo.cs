@@ -70,19 +70,104 @@ namespace projetointerdisciplinar
             return false;
         }
 
+        public string Imprime()
+        {
+            return "\nNumero de reservas no voo: " + numberReservations +
+            "\n\nRelação de passageiros: \n" + RelacaoDePassageiros() +
+            "\n\nTamanho da fila de espera: " + waitingLine.Count +
+            "\nPassageiros na fila de espera: \n" + RelacaoFila();
+
+        }
+
+        public string AssentosVagos()
+        {
+            string response = "";
+            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
+            {
+                if (assentoPassageiro.Value == null)
+                {
+                    response += "[ " + assentoPassageiro.Key + " ] ";
+                }
+            }
+            return response;
+        }
+
+        public bool AssentoVago(int assento)
+        {
+            if (seats[assento] == null) // se o assento está vago retorna true
+                return true;
+            return false;
+        }
+
+        private string RelacaoFila()
+        {
+            string relacao = "";
+
+            foreach (string passageiro in filaDeEspera)
+            {
+                relacao += "\nCPF do passageiro: " + passageiro;
+            }
+
+            return relacao;
+        }
+
+        private string RelacaoDePassageiros()
+        {
+            string relacao = "";
+
+            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
+            {
+                if (assentoPassageiro.Value == null) // se não possui ninguem no assento.
+                    relacao += "\nNumero do assento: [" + assentoPassageiro.Key + "] ##  Assento Vago";
+                else
+                    relacao += "\nNumero do assento: [" + assentoPassageiro.Key + "] ##  CPF do passageiro: [" + assentoPassageiro.Value + "]";
+            }
+
+            return relacao;
+        }
+
         private void ReservarAssento(int assentoPassageiro, string v)
         {
             throw new NotImplementedException();
         }
 
-        private void Atualizar_VooLotado()
+        private bool Atualizar_VooLotado()
         {
-            throw new NotImplementedException();
+            // se contem assento com Valor nulo = false existe assento vago e o voo não está lotado
+            if (seats.ContainsValue(null))
+            {
+                status = "Existem vagas";
+                return false;
+            }
+            else
+            {
+                if (waitingLine.Count < 5)
+                {
+                    status = "Vagas na fila";
+                    return false;
+                }
+            }
+            status = "Voo lotado";
+            return true;
         }
 
         private int AssentoPassageiro(string cPF)
         {
             throw new NotImplementedException();
         }
+
+        public bool VooLotado()
+        {
+            if (seats.ContainsValue(null))
+                return false;
+            return true;
+        }
+
+        public int GetNumeroReservas()
+        {
+            return numberReservations;
+        }
+
+
     }
 }
