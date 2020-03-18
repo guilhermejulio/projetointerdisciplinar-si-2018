@@ -103,7 +103,7 @@ namespace projetointerdisciplinar
         {
             string relacao = "";
 
-            foreach (string passageiro in filaDeEspera)
+            foreach (string passageiro in waitingLine)
             {
                 relacao += "\nCPF do passageiro: " + passageiro;
             }
@@ -151,9 +151,16 @@ namespace projetointerdisciplinar
             return true;
         }
 
-        private int AssentoPassageiro(string cPF)
+        private int AssentoPassageiro(string CPF)
         {
-            throw new NotImplementedException();
+            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
+            {
+                if (assentoPassageiro.Value == CPF)
+                {
+                    return assentoPassageiro.Key;
+                }
+            }
+            return 0;
         }
 
         public bool VooLotado()
