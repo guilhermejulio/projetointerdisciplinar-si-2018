@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace projetointerdisciplinar
 {
@@ -10,10 +8,12 @@ namespace projetointerdisciplinar
     /// </summary>
     class Fligth
     {
+        #region Atributos
         private int numberReservations;
         Dictionary<int, string> seats = new Dictionary<int, string>();
         private Queue waitingLine = new Queue(5);
         public string status { get; private set; } = "Existem vagas no Voo";
+        #endregion
 
         /// <summary>
         /// Construtor da classe Voo, inicializa todos os assentos com um int como key, e null para o valor,
@@ -26,6 +26,7 @@ namespace projetointerdisciplinar
                 seats.Add(i, null);
         }
 
+        #region Metodos Principais
         /// <summary>
         /// Metodo de reserva de assento, retorna a resposta da solicitação por meio de um booleano
         /// </summary>
@@ -36,7 +37,7 @@ namespace projetointerdisciplinar
         {
             seats[numberSeat] = passenger_ID;
             numberReservations++;
-            Atualizar_VooLotado();
+            UpdateFligth();
 
             return true;
         }
@@ -50,17 +51,17 @@ namespace projetointerdisciplinar
         {
             if (seats.ContainsValue(passenger_ID))
             {
-                int assentoPassageiro = AssentoPassageiro(passenger_ID);
+                int passengerSeat = PassengerSeat(passenger_ID);
                 //chamada do metodo que retorna o assento do passageiro
 
-                seats[assentoPassageiro] = null;
+                seats[passengerSeat] = null;
                 numberReservations--;
 
-                Atualizar_VooLotado(); 
+                UpdateFligth();
 
 
                 if (waitingLine.Count > 0) //reservando assento para passageiro na lista de espera.
-                    ReservarAssento(assentoPassageiro, (string)waitingLine.Dequeue());
+                    ReserveSeat(passengerSeat, (string)waitingLine.Dequeue());
 
                 return true;
             }
@@ -73,7 +74,7 @@ namespace projetointerdisciplinar
         /// </summary>
         /// <param name="passenger_ID">Documento do passageiro, CPF</param>
         /// <returns></returns>
-        public bool ReservarNaFila(string passenger_ID)
+        public bool BookInLine(string passenger_ID)
         {
             if (waitingLine.Count < 5) //Regra 3 Inclusão - verificação se a fila está lotada
             {
@@ -88,11 +89,31 @@ namespace projetointerdisciplinar
         }
 
         /// <summary>
+        /// Metodo que retorna uma string de todos os assentos vagos
+        /// </summary>
+        /// <returns></returns>
+        public string VacantSeats()
+        {
+            string response = "";
+            foreach (KeyValuePair<int, string> passengerSeat in seats)
+            {
+                if (passengerSeat.Value == null)
+                {
+                    response += "[ " + passengerSeat.Key + " ] ";
+                }
+            }
+            return response;
+        }
+
+        #endregion
+
+        #region Metodos extra
+        /// <summary>
         /// Metodo que retorna se um determinado passageiro possui reserva no Voo
         /// </summary>
         /// <param name="passenger_ID">Documento do passageiro, CPF</param>
         /// <returns></returns>
-        public bool PossuiReserva(string passenger_ID)
+        public bool hasReservation(string passenger_ID)
         {
             if (seats.ContainsValue(passenger_ID) || waitingLine.Contains(passenger_ID))
                 return true;
@@ -103,30 +124,13 @@ namespace projetointerdisciplinar
         /// Metodo que imprime detalhes sobre o Voo
         /// </summary>
         /// <returns></returns>
-        public string Imprime()
+        public string Print()
         {
             return "\nNumero de reservas no voo: " + numberReservations +
-            "\n\nRelação de passageiros: \n" + RelacaoDePassageiros() +
+            "\n\nRelação de passageiros: \n" + PassengerList() +
             "\n\nTamanho da fila de espera: " + waitingLine.Count +
             "\nPassageiros na fila de espera: \n" + QueueRelationship();
 
-        }
-
-        /// <summary>
-        /// Metodo que retorna uma string de todos os assentos vagos
-        /// </summary>
-        /// <returns></returns>
-        public string AssentosVagos()
-        {
-            string response = "";
-            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
-            {
-                if (assentoPassageiro.Value == null)
-                {
-                    response += "[ " + assentoPassageiro.Key + " ] ";
-                }
-            }
-            return response;
         }
 
         /// <summary>
@@ -147,55 +151,103 @@ namespace projetointerdisciplinar
         /// <returns></returns>
         private string QueueRelationship()
         {
-            string relacao = "";
+            string relationship = "";
 
-            foreach (string passageiro in waitingLine)
+            foreach (string passenger in waitingLine)
             {
-                relacao += "\nCPF do passageiro: " + passageiro;
+                relationship += "\nCPF do passageiro: " + passenger;
             }
 
-            return relacao;
+            return relationship;
         }
 
         /// <summary>
         /// Metodo que retorna a relação de passageiros do voo
         /// </summary>
-        private string RelacaoDePassageiros()
+        private string PassengerList()
         {
-            string relacao = "";
+            string relationship = "";
 
-            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
+            foreach (KeyValuePair<int, string> passengerSeat in seats)
             {
-                if (assentoPassageiro.Value == null) // se não possui ninguem no assento.
-                    relacao += "\nNumero do assento: [" + assentoPassageiro.Key + "] ##  Assento Vago";
+                if (passengerSeat.Value == null) // se não possui ninguem no assento.
+                    relationship += "\nNumero do assento: [" + passengerSeat.Key + "] ##  Assento Vago";
                 else
-                    relacao += "\nNumero do assento: [" + assentoPassageiro.Key + "] ##  CPF do passageiro: [" + assentoPassageiro.Value + "]";
+                    relationship += "\nNumero do assento: [" + passengerSeat.Key + "] ##  CPF do passageiro: [" + passengerSeat.Value + "]";
             }
 
-            return relacao;
+            return relationship;
         }
 
         /// <summary>
-        /// Metodo que realiza a reserva de um assento no Voo
+        /// Metodo que retorna o numero do assento de um determinado passageiro
         /// </summary>
-        /// <param name="assentoPassageiro">Assento escolhido</param>
-        /// <param name="passenger_ID">Documento do passageiro</param>
-        private bool ReservarAssento(int assentoPassageiro, string passenger_ID)
+        /// <param name="passenger_ID"></param>
+        /// <returns></returns>
+        private int PassengerSeat(string passenger_ID)
         {
-            seats[assentoPassageiro] = passenger_ID;
-            numberReservations++;
-
-            Atualizar_VooLotado(); //atualizar status do voo.
-
-
-            return true;
+            foreach (KeyValuePair<int, string> passengerSeat in seats)
+            {
+                if (passengerSeat.Value == passenger_ID)
+                {
+                    return passengerSeat.Key;
+                }
+            }
+            return 0;
         }
 
+        /// <summary>
+        /// Metodo que retorna o numero de assentos vagos do Voo
+        /// </summary>
+        /// <returns></returns>
+        public int EmptySeats()
+        {
+            int emptySeats = 0;
+
+            foreach (KeyValuePair<int, string> aux in seats)
+            {
+                if (aux.Value == null)
+                    emptySeats++;
+            }
+            return emptySeats;
+        }
+
+        /// <summary>
+        /// Metodo que retorna o numero total de vagas na fila de espera
+        /// </summary>
+        /// <returns></returns>
+        public int NumberSeatsQueue()
+        {
+            return 5 - waitingLine.Count;
+        }
+
+        /// <summary>
+        /// Metodo que retorna o numero total de reservas do Voo
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumberReservations()
+        {
+            return numberReservations;
+        }
+
+        /// <summary>
+        /// Metodo que retorna se o Voo está lotado
+        /// </summary>
+        /// <returns></returns>
+        public bool FullFligth()
+        {
+            if (seats.ContainsValue(null))
+                return false;
+            return true;
+        }
+        #endregion
+
+        #region Metodos auxiliares - usados apenas na classe
         /// <summary>
         /// Metodo de verificação sobre se o voo está lotado
         /// </summary>
         /// <returns></returns>
-        private bool Atualizar_VooLotado()
+        private bool UpdateFligth()
         {
             // se contem assento com Valor nulo = false existe assento vago e o voo não está lotado
             if (seats.ContainsValue(null))
@@ -215,47 +267,7 @@ namespace projetointerdisciplinar
             return true;
         }
 
-        private int AssentoPassageiro(string CPF)
-        {
-            foreach (KeyValuePair<int, string> assentoPassageiro in seats)
-            {
-                if (assentoPassageiro.Value == CPF)
-                {
-                    return assentoPassageiro.Key;
-                }
-            }
-            return 0;
-        }
-
-        public int NumeroDeAssentosVagos()
-        {
-            int assentos_vagos = 0;
-
-            foreach (KeyValuePair<int, string> aux in seats)
-            {
-                if (aux.Value == null)
-                    assentos_vagos++;
-            }
-            return assentos_vagos;
-        }   
-
-        public bool VooLotado()
-        {
-            if (seats.ContainsValue(null))
-                return false;
-            return true;
-        }
-
-        public int GetNumeroReservas()
-        {
-            return numberReservations;
-        }
-
-        public int NumeroDeVagasNaFila()
-        {
-            return 5 - waitingLine.Count;
-        }
-
+        #endregion
 
     }
 }
