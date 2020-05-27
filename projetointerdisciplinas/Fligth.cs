@@ -12,6 +12,7 @@ namespace projetointerdisciplinar
         private int numberReservations;
         Dictionary<int, string> seats = new Dictionary<int, string>();
         private Queue waitingLine = new Queue(5);
+        public string destino { get; private set; }
         public string status { get; private set; } = "Existem vagas no Voo";
         #endregion
 
@@ -20,10 +21,11 @@ namespace projetointerdisciplinar
         /// ou seja, quando o passageiro é nullo não existe passageiro no assento.  
         /// null neste caso é igual a vago
         /// </summary>
-        public Fligth()
+        public Fligth(string destino)
         {
             for(int i =1; i<=10; i++)
                 seats.Add(i, null);
+            this.destino = destino;
         }
 
         #region Metodos Principais
@@ -40,6 +42,14 @@ namespace projetointerdisciplinar
             UpdateFligth();
 
             return true;
+        }
+
+        /// <summary>
+        /// Metodo que define o destino do Voo
+        /// </summary>
+        public void SetDestination(string destiny)
+        {
+            destino = destiny;
         }
 
         /// <summary>
@@ -126,7 +136,7 @@ namespace projetointerdisciplinar
         /// <returns></returns>
         public string Print()
         {
-            return "\nNumero de reservas no voo: " + numberReservations +
+            return "\nDestino do Voo: "+destino+"\nNumero de reservas no voo: " + numberReservations +
             "\n\nRelação de passageiros: \n" + PassengerList() +
             "\n\nTamanho da fila de espera: " + waitingLine.Count +
             "\nPassageiros na fila de espera: \n" + QueueRelationship();
